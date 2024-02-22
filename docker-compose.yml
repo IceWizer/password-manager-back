@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  web:
+    image: httpd:2.4
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/web/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
+    depends_on:
+      - php
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+    links:
+      - "db:database"
+  php:
+    build: .
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    links:
+      - "db:database"
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=Not24get
+      - MYSQL_DATABASE=password-manager
+      - MYSQL_USER=password-manager
+      - MYSQL_PASSWORD=Not24get
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+    volumes:
+      - assogest-db:/var/lib/mysql
+
+volumes:
+  assogest-db: {}
