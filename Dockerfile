@@ -1,4 +1,4 @@
-FROM php:8.2.0-fpm-alpine
+FROM php:8.3.3-fpm-alpine
 LABEL authors="flori"
 
 COPY --from=composer:2.1.9 /usr/bin/composer /usr/bin/composer
@@ -25,10 +25,10 @@ RUN composer install --no-interaction
 EXPOSE 80
 
 # Entrypoint script
-COPY ./docker/php/entrypoint.sh /var/www/html/docker/php/entrypoint.sh
-RUN chmod +x /var/www/html/docker/php/entrypoint.sh
+COPY ./docker/php/entrypoint.sh /docker/php/entrypoint.sh
+RUN chmod +x /docker/php/entrypoint.sh
 
 ADD docker/php/conf.d/php.ini /usr/local/etc/php/
 ADD docker/php/conf.d/www.conf /usr/local/etc/php-fpm.d/
 
-#ENTRYPOINT ["/var/www/html/docker/php/entrypoint.sh"]
+ENTRYPOINT ["/docker/php/entrypoint.sh"]

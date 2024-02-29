@@ -13,3 +13,4 @@ fi
 
 # symfony server:start --port=80 --allow-http
 
+php-fpm
