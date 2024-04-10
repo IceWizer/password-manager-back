@@ -8,6 +8,10 @@ doctrine:
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+        types:
+            uuid:
+                class: Ramsey\Uuid\Doctrine\UuidType
+                commented: false
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
