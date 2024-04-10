@@ -34,6 +34,13 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
     volumes:
       - assogest-db:/var/lib/mysql
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 18080:8080
+    links:
+        - "db:database"
 
 volumes:
   assogest-db: {}
