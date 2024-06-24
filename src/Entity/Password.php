@@ -32,6 +32,9 @@ class Password
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $comment = null;
+
     public function __construct()
     {
         $this->shares = new ArrayCollection();
@@ -104,6 +107,18 @@ class Password
     public function setOwner(?User $owner): static
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?string $comment): static
+    {
+        $this->comment = $comment;
 
         return $this;
     }
