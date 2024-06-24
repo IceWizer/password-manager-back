@@ -19,6 +19,9 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
+    
+    app.jwt_custom_api_authenticator:
+        class: App\Http\Api\Security\Authenticator\JWTCustomApiAuthenticator
+        parent: lexik_jwt_authentication.security.jwt_authenticator
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
