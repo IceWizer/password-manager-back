@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Password;
 use App\Entity\User;
+use App\Service\EncryptionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +29,7 @@ class PasswordController extends AbstractController
     }
 
     #[Route('/api/passwords', name: 'app_passwords_create', methods: ['POST'])]
-    public function create(#[CurrentUser] ?UserInterface $user, Request $request, EntityManagerInterface $em, LoggerInterface $logger): Response
+    public function create(#[CurrentUser] ?UserInterface $user, Request $request, EntityManagerInterface $em, LoggerInterface $logger, EncryptionService $encryptionService): Response
     {
         $logger->info('User in create method:', ['user' => $user]);
         $token = $request->headers->get('Authorization');
@@ -43,17 +44,69 @@ class PasswordController extends AbstractController
         $password = new Password();
         $password->setLabel($data->get('label'));
         $password->setCreatedAt(new \DateTimeImmutable());
-        // Encrypt the password
-        $cipher = 'aes-256-cbc';
-        $p = $data->get('password');
-        $p = openssl_encrypt($p, $cipher, $_ENV['APP_SECRET'] . $password->getCreatedAt()->format('Y-m-d H:i:s'), 0, $_ENV['APP_IV']);
-        $password->setPassword($p);
+        $password->setPassword($encryptionService->encrypt($data->get("password"), $password->getCreatedAt()->format('Y-m-d H:i:s')));
         $password->setComment($data->get('comment'));
         $password->setOwner($user);
 
         $em->persist($password);
         $em->flush();
 
+        return $this->json($password, 200, [], ['groups' => 'password:read']);
+    }
+
+    #[Route('/api/passwords/{id}', name: 'app_passwords_delete', methods: ['DELETE'])]
+    public function delete(#[CurrentUser] ?UserInterface $user, Password $password, EntityManagerInterface $em): Response
+    {
+        if (!$user) {
+            return $this->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if ($password->getOwner() !== $user) {
+            return $this->json(['error' => 'Forbidden'], 403);
+        }
+
+        $em->remove($password);
+        $em->flush();
+
+        return $this->json(null, 204);
+    }
+
+    #[Route('/api/passwords/{id}', name: 'app_passwords_update', methods: ['PUT'])]
+    public function update(#[CurrentUser] ?UserInterface $user, Password $password, Request $request, EntityManagerInterface $em): Response
+    {
+        if (!$user) {
+            return $this->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if ($password->getOwner() !== $user) {
+            return $this->json(['error' => 'Forbidden'], 403);
+        }
+
+        $data = $request->getPayload();
+
+        $password->setLabel($data->get('label'));
+        $password->setComment($data->get('comment'));
+
+        $em->flush();
+
         return $this->json($password);
+    }
+
+    #[Route('/api/passwords/{id}/{encryptionKey}', name: 'app_passwords_show', methods: ['GET'])]
+    public function show(#[CurrentUser] ?UserInterface $user, Password $password, EncryptionService $encryptionService, string $encryptionKey): Response
+    {
+        if (!$user) {
+            return $this->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if ($password->getOwner() !== $user) {
+            return $this->json(['error' => 'Forbidden'], 403);
+        }
+
+        $password = $encryptionService->decrypt($password->getPassword(), $password->getCreatedAt()->format('Y-m-d H:i:s'));
+        // $password = $encryptionService->encrypt("1234", $encryptionKey);
+        // $t = $encryptionService->decrypt($password, $encryptionKey);
+
+        return $this->json(["data" => $password]);
     }
 }
