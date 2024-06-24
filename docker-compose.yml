@@ -40,6 +40,13 @@ services:
       - 18080:8080
     links:
         - "db:database"
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: unless-stopped
+    ports:
+      - 8025:8025
+      - 1025:1025
 
 volumes:
   assogest-db: {}
