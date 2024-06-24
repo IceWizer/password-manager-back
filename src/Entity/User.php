@@ -31,9 +31,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'users')]
-    private Collection $passwordGroups;
-
     #[ORM\OneToMany(targetEntity: Password::class, mappedBy: 'owner')]
     private Collection $passwords;
 
@@ -43,10 +40,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 350, nullable: true)]
     private ?string $token = null;
 
+    /**
+     * @var Collection<int, Share>
+     */
+    #[ORM\OneToMany(targetEntity: Share::class, mappedBy: 'target', orphanRemoval: true)]
+    private Collection $shares;
+
     public function __construct()
     {
-        $this->passwordGroups = new ArrayCollection();
         $this->passwords = new ArrayCollection();
+        $this->shares = new ArrayCollection();
     }
 
     public function getId(): ?UuidInterface
@@ -74,33 +77,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Group>
-     */
-    public function getPasswordGroups(): Collection
-    {
-        return $this->passwordGroups;
-    }
-
-    public function addPasswordGroup(Group $passwordGroup): static
-    {
-        if (!$this->passwordGroups->contains($passwordGroup)) {
-            $this->passwordGroups->add($passwordGroup);
-            $passwordGroup->addUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removePasswordGroup(Group $passwordGroup): static
-    {
-        if ($this->passwordGroups->removeElement($passwordGroup)) {
-            $passwordGroup->removeUser($this);
-        }
 
         return $this;
     }
@@ -178,5 +154,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isVerified(): bool
     {
         return $this->emailVerifiedAt !== null;
+    }
+
+    /**
+     * @return Collection<int, Share>
+     */
+    public function getShares(): Collection
+    {
+        return $this->shares;
+    }
+
+    public function addShare(Share $share): static
+    {
+        if (!$this->shares->contains($share)) {
+            $this->shares->add($share);
+            $share->setTarget($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShare(Share $share): static
+    {
+        if ($this->shares->removeElement($share)) {
+            // set the owning side to null (unless already changed)
+            if ($share->getTarget() === $this) {
+                $share->setTarget(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -22,9 +22,6 @@ class Password
     #[ORM\Column(length: 255)]
     private ?string $label = null;
 
-    #[ORM\ManyToOne(inversedBy: 'passwords')]
-    private ?Group $groupUser = null;
-
     #[ORM\OneToMany(targetEntity: Share::class, mappedBy: 'password', orphanRemoval: true)]
     private Collection $shares;
 
@@ -34,6 +31,9 @@ class Password
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $comment = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $password = null;
 
     public function __construct()
     {
@@ -53,18 +53,6 @@ class Password
     public function setLabel(string $label): static
     {
         $this->label = $label;
-
-        return $this;
-    }
-
-    public function getGroupUser(): ?Group
-    {
-        return $this->groupUser;
-    }
-
-    public function setGroupUser(?Group $groupUser): static
-    {
-        $this->groupUser = $groupUser;
 
         return $this;
     }
@@ -119,6 +107,18 @@ class Password
     public function setComment(?string $comment): static
     {
         $this->comment = $comment;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
         return $this;
     }

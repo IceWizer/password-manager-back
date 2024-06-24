@@ -24,6 +24,10 @@ class Share
     #[ORM\JoinColumn(nullable: false)]
     private ?Password $password = null;
 
+    #[ORM\ManyToOne(inversedBy: 'shares')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $target = null;
+
     public function getId(): ?UuidInterface
     {
         return $this->id;
@@ -49,6 +53,18 @@ class Share
     public function setPassword(?Password $password): static
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getTarget(): ?User
+    {
+        return $this->target;
+    }
+
+    public function setTarget(?User $target): static
+    {
+        $this->target = $target;
 
         return $this;
     }
