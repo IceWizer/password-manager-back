@@ -8,26 +8,36 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: email
+                property: id
+                
     firewalls:
         login:
             pattern: ^/api/auth/login
             stateless: true
             json_login:
                 check_path: api_login
+                username_path: email
+                password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
         api:
             pattern: ^/api
             stateless: true
-            jwt: ~
+            jwt:
+                provider: app_user_provider
+                authenticator: lexik_jwt_authentication.security.jwt_authenticator
+
 
     access_control:
         - { path: ^/api/auth/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs*, roles: PUBLIC_ACCESS}
+        - { path: ^/api/passwords/, roles: PUBLIC_ACCESS}
+
 
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER
+        ROLE_USER: PUBLIC_ACCESS
 
 when@test:
     security:

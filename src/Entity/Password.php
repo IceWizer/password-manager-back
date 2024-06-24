@@ -3,23 +3,26 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use App\Repository\PasswordRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PasswordRepository::class)]
-#[ApiResource]
 class Password
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: 'uuid')]
     #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
+    #[Groups(['password:read'])]
     private ?UuidInterface $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['password:read'])]
     private ?string $label = null;
 
     #[ORM\OneToMany(targetEntity: Share::class, mappedBy: 'password', orphanRemoval: true)]
@@ -30,10 +33,14 @@ class Password
     private ?User $owner = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['password:read'])]
     private ?string $comment = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
     {
@@ -119,6 +126,18 @@ class Password
     public function setPassword(string $password): static
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
