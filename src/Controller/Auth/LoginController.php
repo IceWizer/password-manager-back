@@ -95,4 +95,66 @@ class LoginController extends AbstractController
             'message' => 'Email verified successfully',
         ]);
     }
+
+    #[Route("/api/auth/forgot-password", name: "api_forgot_password", methods: ["POST"])]
+    public function forgotPassword(Request $request, EntityManagerInterface $em, MailerInterface $mailer): Response
+    {
+        $payload = $request->getPayload();
+
+        $user = $em->getRepository(User::class)->findOneBy(['email' => $payload->get('email')]);
+
+        if (!$user) {
+            return $this->json([
+                'message' => 'OK',
+            ]);
+        }
+
+        $token = StrRandom::generateRandomString(250, 350);
+
+        while ($em->getRepository(User::class)->findOneBy(['token' => $token])) {
+            $token = StrRandom::generateRandomString(250, 350);
+        }
+
+        $user->setToken($token);
+        $user->setEmailVerifiedAt(null);
+
+        $em->flush();
+
+        $email = (new Email())
+            ->from('no-reply@password-manager.icewize.fr')
+            ->to($payload->get('email'))
+            ->subject('Récupération de mot de passe')
+            ->text('Veuillez cliquer sur ce lien pour réinitialiser votre mot de passe')
+            ->html('<a href="http://localhost:5173/reset-password/' . $user->getToken() . '">Cliquez ici pour réinitialiser votre mot de passe</a>');
+
+        $mailer->send($email);
+
+        return $this->json([
+            'message' => 'OK',
+        ]);
+    }
+
+    #[Route("/api/auth/reset-password/{token}", name: "api_reset_password", methods: ["POST"])]
+    public function resetPassword(string $token, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $user = $em->getRepository(User::class)->findOneBy(['token' => $token]);
+
+        if (!$user) {
+            return $this->json([
+                'message' => 'Invalid token',
+            ], 400);
+        }
+
+        $payload = $request->getPayload();
+
+        $user->setPassword($passwordHasher->hashPassword($user, $payload->get('password')));
+        $user->setToken(null);
+        $user->setEmailVerifiedAt(new \DateTimeImmutable());
+
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Password reset successfully',
+        ]);
+    }
 }
