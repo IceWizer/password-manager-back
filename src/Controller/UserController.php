@@ -13,7 +13,6 @@ class UserController extends AbstractController
     public function index(): JsonResponse
     {
         return new JsonResponse([
-            'username' => 'jane_doe',
             'email' => '@'
         ]);
     }

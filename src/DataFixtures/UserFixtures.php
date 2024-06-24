@@ -28,7 +28,6 @@ class UserFixtures extends Fixture
         $password = $this->hasher->hashPassword($sup, 'Not24get');
         $sup->setEmail('superadmin@icewize.fr');
         $sup->setPassword($password);
-        $sup->setUsername('superadmin');
         $sup->setEmailVerifiedAt(new \DateTimeImmutable());
         $manager->persist($sup);
 
@@ -36,7 +35,6 @@ class UserFixtures extends Fixture
         $password = $this->hasher->hashPassword($admin, 'Not24get');
         $admin->setEmail('admin@icewize.fr');
         $admin->setPassword($password);
-        $admin->setUsername('admin');
         $admin->setEmailVerifiedAt(new \DateTimeImmutable());
         $manager->persist($admin);
 
@@ -44,7 +42,6 @@ class UserFixtures extends Fixture
         $password = $this->hasher->hashPassword($user, 'Not24get');
         $user->setEmail('user@icewize.fr');
         $user->setPassword($password);
-        $user->setUsername('user');
         $user->setEmailVerifiedAt(new \DateTimeImmutable());
         $manager->persist($user);
 

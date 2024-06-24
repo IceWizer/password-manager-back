@@ -38,7 +38,7 @@ class LoginController extends AbstractController
         $payload = $request->getPayload();
 
         // Check the unicity of the email
-        if ($em->getRepository(User::class)->findOneBy(['email' => $payload->get('email')]) === null) {
+        if ($em->getRepository(User::class)->findOneBy(['email' => $payload->get('email')]) !== null) {
             return $this->json([
                 'message' => 'Email already exists',
             ], 400);
