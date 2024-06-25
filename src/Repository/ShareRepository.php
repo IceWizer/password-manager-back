@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Share;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,20 +22,20 @@ class ShareRepository extends ServiceEntityRepository
         parent::__construct($registry, Share::class);
     }
 
-    //    /**
-    //     * @return Share[] Returns an array of Share objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Share[] Returns an array of Share objects
+     */
+    public function findByTarget($target_id): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.target = :val')
+            ->setParameter('val', $target_id)
+            ->andWhere('s.expireAt > :param')
+            ->setParameter('param', new DateTime())
+            ->orderBy('s.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
     //    public function findOneBySomeField($value): ?Share
     //    {

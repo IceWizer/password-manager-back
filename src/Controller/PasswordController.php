@@ -6,6 +6,7 @@ use App\Entity\Password;
 use App\Entity\Share;
 use App\Entity\User;
 use App\Service\EncryptionService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,7 +37,7 @@ class PasswordController extends AbstractController
             return $this->json(['error' => 'Unauthorized'], 401);
         }
 
-        $sharedPasswords = $em->getRepository(Share::class)->findBy(['target' => $user->getId()]);
+        $sharedPasswords = $em->getRepository(Share::class)->findByTarget($user->getId());
 
         $passwords = [];
 

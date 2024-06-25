@@ -3,12 +3,17 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use App\Repository\ShareRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\UuidInterface;
 
 #[ORM\Entity(repositoryClass: ShareRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Post()
+    ]
+)]
 class Share
 {
     #[ORM\Id]

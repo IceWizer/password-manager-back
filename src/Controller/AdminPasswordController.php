@@ -16,7 +16,7 @@ class AdminPasswordController extends AbstractController
     {
         // Pagination
         $maxItems = $em->getRepository(Password::class)->count([]);
-        $limit = $request->query->get('limit', 10);
+        $limit = $request->query->get('limit', 10000);
         $lastPage = ceil($maxItems / $limit);
         $page = min($request->query->get('page', 1), $lastPage);
 
