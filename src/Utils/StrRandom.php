@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Utils;
+
 class StrRandom
 {
     public static function generateRandomString($minLength, $maxLength)
