@@ -22,7 +22,7 @@ security:
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
         api:
-            pattern: ^/api
+            pattern: ^/api/(?!auth)
             stateless: true
             jwt:
                 provider: app_user_provider
@@ -30,14 +30,13 @@ security:
 
 
     access_control:
-        - { path: ^/api/auth/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/docs*, roles: PUBLIC_ACCESS}
-        - { path: ^/api/passwords/, roles: PUBLIC_ACCESS}
+        - { path: ^/api/auth/*, roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs*, roles: PUBLIC_ACCESS }
+        - { path: ^/api/*, roles: ROLE_USER }
 
 
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER
-        ROLE_USER: PUBLIC_ACCESS
 
 when@test:
     security:

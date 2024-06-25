@@ -96,7 +96,7 @@ class LoginController extends AbstractController
         ]);
     }
 
-    #[Route("/api/auth/forgot-password", name: "api_forgot_password", methods: ["POST"])]
+    #[Route("/api/auth/forgot-password", name: "api_forgot_password", methods: ["POST"], options: ["no_auth" => true])]
     public function forgotPassword(Request $request, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         $payload = $request->getPayload();
@@ -118,8 +118,6 @@ class LoginController extends AbstractController
         $user->setToken($token);
         $user->setEmailVerifiedAt(null);
 
-        $em->flush();
-
         $email = (new Email())
             ->from('no-reply@password-manager.icewize.fr')
             ->to($payload->get('email'))
@@ -128,6 +126,8 @@ class LoginController extends AbstractController
             ->html('<a href="http://localhost:5173/reset-password/' . $user->getToken() . '">Cliquez ici pour réinitialiser votre mot de passe</a>');
 
         $mailer->send($email);
+
+        $em->flush();
 
         return $this->json([
             'message' => 'OK',

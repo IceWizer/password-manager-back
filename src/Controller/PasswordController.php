@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Password;
+use App\Entity\Share;
 use App\Entity\User;
 use App\Service\EncryptionService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +27,38 @@ class PasswordController extends AbstractController
         $passwords = $em->getRepository(Password::class)->findBy(['owner' => $user]);
 
         return $this->json($passwords, 200, [], ['groups' => 'password:read']);
+    }
+
+    #[Route('/api/passwords/shared', name: 'app_passwords_index_shared', methods: ['GET'])]
+    public function indexShared(#[CurrentUser] ?UserInterface $user, EntityManagerInterface $em): Response
+    {
+        if (!$user) {
+            return $this->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $sharedPasswords = $em->getRepository(Share::class)->findBy(['target' => $user->getId()]);
+
+        $passwords = [];
+
+        foreach ($sharedPasswords as $sharedPassword) {
+            $passwords[] = $sharedPassword->getPassword();
+        }
+
+        return $this->json($passwords, 200, [], ['groups' => 'password:read']);
+    }
+
+    #[Route('/api/passwords/{id}', name: 'app_passwords_show', methods: ['GET'])]
+    public function show(#[CurrentUser] ?UserInterface $user, Password $password): Response
+    {
+        if (!$user) {
+            return $this->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if ($password->getOwner() !== $user) {
+            return $this->json(['error' => 'Forbidden'], 403);
+        }
+
+        return $this->json($password, 200, [], ['groups' => 'password:read']);
     }
 
     #[Route('/api/passwords', name: 'app_passwords_create', methods: ['POST'])]
@@ -85,21 +118,28 @@ class PasswordController extends AbstractController
         $data = $request->getPayload();
 
         $password->setLabel($data->get('label'));
+
+        if ($data->get('password')) {
+            $password->setPassword($data->get('password'));
+        }
+
         $password->setComment($data->get('comment'));
 
         $em->flush();
 
-        return $this->json($password);
+        return $this->json($password, 200, [], ['groups' => 'password:read']);
     }
 
-    #[Route('/api/passwords/{id}/{encryptionKey}', name: 'app_passwords_show', methods: ['GET'])]
-    public function show(#[CurrentUser] ?UserInterface $user, Password $password, EncryptionService $encryptionService, string $encryptionKey): Response
+    #[Route('/api/passwords/{id}/{encryptionKey}', name: 'app_passwords_show_password', methods: ['GET'])]
+    public function showPassword(#[CurrentUser] ?UserInterface $user, Password $password, EncryptionService $encryptionService, string $encryptionKey, EntityManagerInterface $em): Response
     {
         if (!$user) {
             return $this->json(['error' => 'Unauthorized'], 401);
         }
 
-        if ($password->getOwner() !== $user) {
+        $sharedPasswords = $em->getRepository(Share::class)->findBy(['target' => $user->getId()]);
+
+        if ($password->getOwner() !== $user && count(array_filter($sharedPasswords, fn ($sharedPassword) => $sharedPassword->getPassword() === $password)) === 0) {
             return $this->json(['error' => 'Forbidden'], 403);
         }
 
