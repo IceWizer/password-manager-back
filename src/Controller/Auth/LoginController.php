@@ -4,7 +4,7 @@ namespace App\Controller\Auth;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use StrRandom;
+use App\Utils\StrRandom;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
