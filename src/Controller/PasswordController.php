@@ -105,7 +105,7 @@ class PasswordController extends AbstractController
     }
 
     #[Route('/api/passwords/{id}', name: 'app_passwords_update', methods: ['PUT'])]
-    public function update(#[CurrentUser] ?UserInterface $user, Password $password, Request $request, EntityManagerInterface $em): Response
+    public function update(#[CurrentUser] ?UserInterface $user, Password $password, Request $request, EntityManagerInterface $em,  EncryptionService $encryptionService): Response
     {
         if (!$user) {
             return $this->json(['error' => 'Unauthorized'], 401);
@@ -120,7 +120,7 @@ class PasswordController extends AbstractController
         $password->setLabel($data->get('label'));
 
         if ($data->get('password')) {
-            $password->setPassword($data->get('password'));
+            $password->setPassword($encryptionService->encrypt($data->get("password"), $password->getCreatedAt()->format('Y-m-d H:i:s')));
         }
 
         $password->setComment($data->get('comment'));
