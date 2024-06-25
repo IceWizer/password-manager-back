@@ -32,6 +32,7 @@ class ShareRepository extends ServiceEntityRepository
             ->setParameter('val', $target_id)
             ->andWhere('s.expireAt > :param')
             ->setParameter('param', new DateTime())
+            ->orWhere('s.expireAt IS NULL')
             ->orderBy('s.id', 'ASC')
             ->getQuery()
             ->getResult();
