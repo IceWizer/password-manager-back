@@ -66,7 +66,7 @@ class LoginController extends AbstractController
             ->to($payload->get('email'))
             ->subject('Vérification de votre adresse email')
             ->text('Veuillez cliquer sur ce lien pour valider votre adresse email')
-            ->html('<a href="http://localhost:5173/verify-email/' . $user->getToken() . '">Cliquez ici pour valider votre adresse email</a>');
+            ->html('<a href="https://app.pasword-manager.icewize.fr/verify-email/' . $user->getToken() . '">Cliquez ici pour valider votre adresse email</a>');
 
         $mailer->send($email);
 
@@ -123,7 +123,7 @@ class LoginController extends AbstractController
             ->to($payload->get('email'))
             ->subject('Récupération de mot de passe')
             ->text('Veuillez cliquer sur ce lien pour réinitialiser votre mot de passe')
-            ->html('<a href="http://localhost:5173/reset-password/' . $user->getToken() . '">Cliquez ici pour réinitialiser votre mot de passe</a>');
+            ->html('<a href="https://app.pasword-manager.icewize.fr/reset-password/' . $user->getToken() . '">Cliquez ici pour réinitialiser votre mot de passe</a>');
 
         $mailer->send($email);
 
