@@ -40,6 +40,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 350, nullable: true)]
     private ?string $token = null;
 
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
+
     /**
      * @var Collection<int, Share>
      */
@@ -114,7 +117,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         // TODO: Implement getRoles() method.
-        return ["ROLE_ADMIN"];
+        return $roles ?? ["ROLE_USER"];
     }
 
     public function eraseCredentials(): void

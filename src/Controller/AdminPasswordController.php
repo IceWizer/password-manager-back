@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminPasswordController extends AbstractController
 {
-    #[Route('/admin/password', name: 'app_admin_password')]
+    #[Route('/api/admin/passwords', name: 'app_admin_passwords')]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         // Pagination
