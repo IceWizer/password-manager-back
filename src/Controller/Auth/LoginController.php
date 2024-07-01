@@ -33,7 +33,7 @@ class LoginController extends AbstractController
     }
 
     #[Route("/api/auth/register", name: "api_register", methods: ["POST"])]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em, MailerInterface $mailer): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em, MailerInterface $mailer, string $appUrl = "https://app.pasword-manager.icewize.fr/"): Response
     {
         $payload = $request->getPayload();
 
@@ -66,7 +66,7 @@ class LoginController extends AbstractController
             ->to($payload->get('email'))
             ->subject('Vérification de votre adresse email')
             ->text('Veuillez cliquer sur ce lien pour valider votre adresse email')
-            ->html('<a href="https://app.pasword-manager.icewize.fr/verify-email/' . $user->getToken() . '">Cliquez ici pour valider votre adresse email</a>');
+            ->html('<a href="' . $appUrl . 'verify-email/' . $user->getToken() . '">Cliquez ici pour valider votre adresse email</a>');
 
         $mailer->send($email);
 
@@ -97,7 +97,7 @@ class LoginController extends AbstractController
     }
 
     #[Route("/api/auth/forgot-password", name: "api_forgot_password", methods: ["POST"], options: ["no_auth" => true])]
-    public function forgotPassword(Request $request, EntityManagerInterface $em, MailerInterface $mailer): Response
+    public function forgotPassword(Request $request, EntityManagerInterface $em, MailerInterface $mailer, string $appUrl = "https://app.pasword-manager.icewize.fr/"): Response
     {
         $payload = $request->getPayload();
 
@@ -123,7 +123,7 @@ class LoginController extends AbstractController
             ->to($payload->get('email'))
             ->subject('Récupération de mot de passe')
             ->text('Veuillez cliquer sur ce lien pour réinitialiser votre mot de passe')
-            ->html('<a href="https://app.pasword-manager.icewize.fr/reset-password/' . $user->getToken() . '">Cliquez ici pour réinitialiser votre mot de passe</a>');
+            ->html('<a href="' . $appUrl . 'reset-password/' . $user->getToken() . '">Cliquez ici pour réinitialiser votre mot de passe</a>');
 
         $mailer->send($email);
 
