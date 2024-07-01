@@ -33,7 +33,7 @@ class LoginController extends AbstractController
     }
 
     #[Route("/api/auth/register", name: "api_register", methods: ["POST"])]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em, MailerInterface $mailer, string $appUrl = "https://app.pasword-manager.icewize.fr/"): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em, MailerInterface $mailer, string $appUrl = "https://app.password-manager.icewize.fr/"): Response
     {
         $payload = $request->getPayload();
 
@@ -97,7 +97,7 @@ class LoginController extends AbstractController
     }
 
     #[Route("/api/auth/forgot-password", name: "api_forgot_password", methods: ["POST"], options: ["no_auth" => true])]
-    public function forgotPassword(Request $request, EntityManagerInterface $em, MailerInterface $mailer, string $appUrl = "https://app.pasword-manager.icewize.fr/"): Response
+    public function forgotPassword(Request $request, EntityManagerInterface $em, MailerInterface $mailer, string $appUrl = "https://app.password-manager.icewize.fr/"): Response
     {
         $payload = $request->getPayload();
 
