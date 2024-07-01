@@ -144,9 +144,9 @@ class PasswordController extends AbstractController
             return $this->json(['error' => 'Unauthorized'], 401);
         }
 
-        $sharedPasswords = $em->getRepository(Share::class)->findBy(['target' => $user->getId()]);
+        $sharedPasswords = $em->getRepository(Share::class)->findByTarget($user->getId());
 
-        if ($password->getOwner() !== $user && count(array_filter($sharedPasswords, fn ($sharedPassword) => $sharedPassword->getPassword()->getId() === $password->getId())) === 0) {
+        if ($password->getOwner()->getId() !== $user->getId() && count(array_filter($sharedPasswords, fn ($sharedPassword) => $sharedPassword->getPassword()->getId() === $password->getId())) === 0) {
             return $this->json(['error' => 'Forbidden'], 403);
         }
 
